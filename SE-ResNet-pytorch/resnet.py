@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 
+
 def conv3x3(in_planes, out_planes, stride=1, groups=1, dilation=1):
     """3x3 convolution with padding"""
     return nn.Conv2d(in_planes, out_planes, kernel_size=3, stride=stride,
@@ -103,14 +104,19 @@ class NonLocalBlock(nn.Module):
     https://arxiv.org/pdf/1711.07971.pdf
     https://blog.csdn.net/shanglianlm/article/details/104371212
     """
+
     def __init__(self, channel):
         super(NonLocalBlock, self).__init__()
         self.inter_channel = channel // 2
-        self.conv_phi = nn.Conv2d(in_channels=channel, out_channels=self.inter_channel, kernel_size=1, stride=1,padding=0, bias=False)
-        self.conv_theta = nn.Conv2d(in_channels=channel, out_channels=self.inter_channel, kernel_size=1, stride=1, padding=0, bias=False)
-        self.conv_g = nn.Conv2d(in_channels=channel, out_channels=self.inter_channel, kernel_size=1, stride=1, padding=0, bias=False)
+        self.conv_phi = nn.Conv2d(in_channels=channel, out_channels=self.inter_channel, kernel_size=1, stride=1,
+                                  padding=0, bias=False)
+        self.conv_theta = nn.Conv2d(in_channels=channel, out_channels=self.inter_channel, kernel_size=1, stride=1,
+                                    padding=0, bias=False)
+        self.conv_g = nn.Conv2d(in_channels=channel, out_channels=self.inter_channel, kernel_size=1, stride=1,
+                                padding=0, bias=False)
         self.softmax = nn.Softmax(dim=1)
-        self.conv_mask = nn.Conv2d(in_channels=self.inter_channel, out_channels=channel, kernel_size=1, stride=1, padding=0, bias=False)
+        self.conv_mask = nn.Conv2d(in_channels=self.inter_channel, out_channels=channel, kernel_size=1, stride=1,
+                                   padding=0, bias=False)
         self.relu = nn.ReLU(inplace=True)
         self.bn = nn.BatchNorm2d(num_features=channel)
 
@@ -129,7 +135,7 @@ class NonLocalBlock(nn.Module):
         # [N, H * W, C/2]
         mul_theta_phi_g = torch.matmul(mul_theta_phi, x_g)
         # [N, C/2, H, W]
-        mul_theta_phi_g = mul_theta_phi_g.permute(0,2,1).contiguous().view(b,self.inter_channel, h, w)
+        mul_theta_phi_g = mul_theta_phi_g.permute(0, 2, 1).contiguous().view(b, self.inter_channel, h, w)
         # [N, C, H , W]
         mask = self.conv_mask(mul_theta_phi_g)
         mask = self.bn(mask)
@@ -239,4 +245,3 @@ class ResNet(nn.Module):
 
     def forward(self, x):
         return self._forward_impl(x)
-

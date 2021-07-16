@@ -10,21 +10,21 @@
 
 ## resnet-se的结构如下
 
-![图片名称可省略.jpg](https://github.com/youwh-PIRI/fpn_resnet-resnet-se-resnet-cbam/blob/master/img/resnet-se.JPG)
+![图片名称可省略.jpg](img/resnet-se.JPG)
 
 ## resnet-cbam的结构如下
 
-![图片名称可省略.jpg](https://github.com/youwh-PIRI/fpn_resnet-resnet-se-resnet-cbam/blob/master/img/resnet-cbam-1.JPG)
+![图片名称可省略.jpg](img/resnet-cbam-1.JPG)
 
-![图片名称可省略.jpg](https://github.com/youwh-PIRI/fpn_resnet-resnet-se-resnet-cbam/blob/master/img/resnet-cbam-2.JPG)
+![图片名称可省略.jpg](img/resnet-cbam-2.JPG)
 
 ## resnet各版本对比
 
-![图片名称可省略.jpg](https://github.com/youwh-PIRI/fpn_resnet-resnet-se-resnet-cbam/blob/master/img/compare-resnet.JPG)
+![图片名称可省略.jpg](img/compare-resnet.JPG)
 
 ## 下面是FPN-RESNET-CBAM模型的结构第一层第一个模块以及每层的输出和参数量大小，以此为例
 
-![图片名称可省略.jpg](https://github.com/youwh-PIRI/fpn_resnet-resnet-se-resnet-cbam/blob/master/img/resnet-cbam-model.JPG)
+![图片名称可省略.jpg](img/resnet-cbam-model.JPG)
 
 Total params: 33,691,367
 Trainable params: 33,691,367

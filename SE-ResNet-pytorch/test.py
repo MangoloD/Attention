@@ -24,12 +24,14 @@ parser.add_argument('--height', type=int, default=224,
 parser.add_argument('--width', type=int, default=224,
                     help='input width of network')
 parser.add_argument('--batch_size', type=int, default=64)
-parser.add_argument('--model_path', type=str, default='./models/seresnet50/seresnet50_final.pth', help='path to save models')
+parser.add_argument('--model_path', type=str, default='./models/seresnet50/seresnet50_final.pth',
+                    help='path to save models')
 parser.add_argument('--class_num', type=int, default=4, help='the total classes')
 args = parser.parse_args()
 
+
 def img_label_dic(filepath):
-    f1 = open(filepath,'r',encoding='utf-8')
+    f1 = open(filepath, 'r', encoding='utf-8')
     file_list1 = f1.readlines()
     dic_img_label = {}
     for line in file_list1:
@@ -40,18 +42,19 @@ def img_label_dic(filepath):
     f1.close()
     return dic_img_label
 
+
 to_bgr_transform = transforms.Lambda(lambda x: x[[2, 1, 0]])
 transform = transforms.Compose([
     transforms.ToPILImage(),
     dataset.PadImage(),
-    transforms.Resize([args.height, args.width],interpolation=3), transforms.ToTensor(),
+    transforms.Resize([args.height, args.width], interpolation=3), transforms.ToTensor(),
     to_bgr_transform,
     transforms.Normalize((0.5,), (0.5,))
 ])
 transform_crop = transforms.Compose([
     transforms.ToPILImage(),
     dataset.CropPadImage(),
-    transforms.Resize([args.height, args.width],interpolation=3), transforms.ToTensor(),
+    transforms.Resize([args.height, args.width], interpolation=3), transforms.ToTensor(),
     to_bgr_transform,
     transforms.Normalize((0.5,), (0.5,))
 ])
@@ -67,6 +70,7 @@ def run_on_opencv_block(img):
     label = preds[0].item()
     return label
 
+
 def run_on_opencv_imgbatch(img):
     images = [transform_crop(img) for i in range(3)]
     images = torch.cat([t.unsqueeze(0) for t in images], 0)
@@ -79,6 +83,7 @@ def run_on_opencv_imgbatch(img):
     label = ind.item()
     return label
 
+
 if __name__ == '__main__':
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     net = se_resnet.se_resnet50(num_classes=args.class_num).to(device)
@@ -89,7 +94,7 @@ if __name__ == '__main__':
     dic_img = img_label_dic(args.eval_list)
     total = 0
     correct = 0
-    for k,v in dic_img.items():
+    for k, v in dic_img.items():
         print(k)
         imgpath = args.eval_imgpath + k
         if not os.path.exists(imgpath):
@@ -101,11 +106,8 @@ if __name__ == '__main__':
         if pred == labels:
             correct += 1
         else:
-            #name = k[:k.rfind('.')] + '_{0}.jpg'.format(pred)
-            #new = '../wrong/' + name
-            #shutil.copy(imgpath, new)
+            # name = k[:k.rfind('.')] + '_{0}.jpg'.format(pred)
+            # new = '../wrong/' + name
+            # shutil.copy(imgpath, new)
             print('{}->{}'.format(k, pred))
     print(correct * 1.0 / total)
-
-
-

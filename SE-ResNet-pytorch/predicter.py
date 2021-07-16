@@ -2,10 +2,11 @@ import os
 import torch
 import torchvision.transforms as transforms
 import se_resnet
-from PIL import Image,ImageOps
+from PIL import Image, ImageOps
 import cv2
 import random
 from math import atan, pi, sin, cos, fabs, radians
+
 
 # parser = argparse.ArgumentParser()
 # parser.add_argument('--eval_imgpath', type=str, default='../valid-data/',
@@ -20,7 +21,6 @@ from math import atan, pi, sin, cos, fabs, radians
 # parser.add_argument('--model_path', type=str, default='./models/seresnet50/seresnet50_final.pth', help='path to save models')
 
 
-
 class PadImage(object):
     def __init__(self):
         pass
@@ -33,6 +33,7 @@ class PadImage(object):
             padding = (pad, 0, pad, 0)
         pad_image = ImageOps.expand(img, padding)
         return pad_image
+
 
 class CropPadImage(object):
     def __init__(self):
@@ -55,6 +56,7 @@ class CropPadImage(object):
         img = ImageOps.expand(img, padding)
         return img
 
+
 class Demo(object):
     def __init__(
             self,
@@ -64,7 +66,7 @@ class Demo(object):
         self.model_path = model_path
         self.img_size = img_size
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        print('devices=',self.device)
+        print('devices=', self.device)
         self.net = se_resnet.se_resnet50(num_classes=4).to(self.device)
         self.net.load_state_dict(torch.load(self.model_path))
         self.net.eval()
@@ -76,7 +78,7 @@ class Demo(object):
             transforms.ToTensor(),
             # to_bgr_transform,
             transforms.Normalize((0.5,), (0.5,))])
-        #for one image crop to a batch
+        # for one image crop to a batch
         self.transform_crop = transforms.Compose([
             transforms.ToPILImage(),
             CropPadImage(),
@@ -105,16 +107,15 @@ class Demo(object):
         outputs = self.net(images)
         # _, preds = outputs.max(1)
         # label = preds[0].item()
-        preds = torch.softmax(outputs,1)
+        preds = torch.softmax(outputs, 1)
         # mer = torch.sum(preds,1)
-        mea = torch.mean(preds,0)
+        mea = torch.mean(preds, 0)
         ind = mea.argmax()
         label = ind.item()
         return label
 
 
 # torch.backends.cudnn.benchmark = True
-
 
 
 block_root = '../valid-data/'
@@ -130,12 +131,7 @@ if __name__ == '__main__':
             continue
         # img = Image.open(imgpath).convert('RGB')
         img = cv2.imread(imgpath)
-        #label = demo.run_on_opencv_image(img)
+        # label = demo.run_on_opencv_image(img)
         label = demo.run_on_opencv_imgbatch(img)
-        print('{} -> {}'.format(k,label))
+        print('{} -> {}'.format(k, label))
         # break
-
-
-        
-
-

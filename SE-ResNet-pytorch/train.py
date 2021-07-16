@@ -24,37 +24,39 @@ model_reg = {
 MILESTONES = [50, 70]
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
+
 def prepare_dataloader():
     transform = transforms.Compose([
         dataset.PadImage(),
-        transforms.Resize([args.height, args.width],interpolation=3),
+        transforms.Resize([args.height, args.width], interpolation=3),
         transforms.ToTensor(),
         transforms.Normalize((0.5,), (0.5,))
     ])
     transformv = transforms.Compose([
         dataset.PadImage(),
-        transforms.Resize([args.height, args.width],interpolation=3),
+        transforms.Resize([args.height, args.width], interpolation=3),
         transforms.ToTensor(),
         transforms.Normalize((0.5,), (0.5,))
     ])
     torch.backends.cudnn.benchmark = True
 
     train_set = dataset.TextLineDataset(rootpath=args.train_imgpath, text_line_file=args.train_list,
-                                            transform=transform, use_rgb=True,is_train=True)
+                                        transform=transform, use_rgb=True, is_train=True)
     trainloader = torch.utils.data.DataLoader(
         dataset=train_set,
         batch_size=args.batch_size,
         shuffle=True,
         num_workers=args.num_workers)
 
-    valid_set = dataset.TextLineDataset(rootpath=args.eval_imgpath,text_line_file=args.eval_list, transform=transformv, use_rgb=True,is_train=False)
+    valid_set = dataset.TextLineDataset(rootpath=args.eval_imgpath, text_line_file=args.eval_list, transform=transformv,
+                                        use_rgb=True, is_train=False)
     validloader = torch.utils.data.DataLoader(
         dataset=valid_set,
         batch_size=args.batch_size,
         num_workers=args.num_workers)
 
-    print('----the train length is:',len(trainloader.dataset))
-    print('----the valid length is:',len(validloader.dataset))
+    print('----the train length is:', len(trainloader.dataset))
+    print('----the valid length is:', len(validloader.dataset))
     return trainloader, validloader
 
 
@@ -151,7 +153,7 @@ if __name__ == '__main__':
     warmup_scheduler = WarmUpLR(optimizer, iter_per_epoch * args.warm)
     # time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     postfix = time.strftime("_%m_%d", time.localtime())
-    checkpoint_path = os.path.join(args.model_path, args.net+postfix)
+    checkpoint_path = os.path.join(args.model_path, args.net + postfix)
     logdir = checkpoint_path
     # # use tensorboard
     # logdir = os.path.join(args.model_path, args.net)
@@ -164,7 +166,7 @@ if __name__ == '__main__':
     checkpoint_path = os.path.join(checkpoint_path, '{net}_{epoch}.pth')
 
     best_acc = 0.0
-    for epoch in range(1, args.epochs+1):
+    for epoch in range(1, args.epochs + 1):
         if epoch > args.warm:
             train_scheduler.step(epoch)
 
@@ -172,7 +174,7 @@ if __name__ == '__main__':
         acc = eval_training(validloader)
         with open('{}/train.log'.format(logdir), 'a') as f:
             f.write('[{}] Accuracy of the network on the {} validation images: {:.2%}\n'.format(
-            epoch, len(validloader.dataset), acc))
+                epoch, len(validloader.dataset), acc))
         # start to save best performance model after learning rate decay to args.lr
         if epoch > MILESTONES[0] and best_acc < acc:
             torch.save(net.state_dict(), checkpoint_path.format(net=args.net, epoch=epoch))

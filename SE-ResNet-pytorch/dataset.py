@@ -11,6 +11,7 @@ from scipy.ndimage import rotate
 from math import atan, pi, sin, cos, fabs, radians
 from PIL import ImageOps
 
+
 class PadImage(object):
     def __init__(self):
         pass
@@ -23,6 +24,7 @@ class PadImage(object):
             padding = (pad, 0, pad, 0)
         pad_image = ImageOps.expand(img, padding)
         return pad_image
+
 
 class CropPadImage(object):
     def __init__(self):
@@ -44,6 +46,7 @@ class CropPadImage(object):
             padding = (pad, 0, pad, 0)
         img = ImageOps.expand(img, padding)
         return img
+
 
 class ImageAug(object):
     def __init__(self):
@@ -115,7 +118,7 @@ class ImageAug(object):
         img_warped = warp(img, tform.inverse, output_shape=(img.shape[0], img.shape[1]))
         img = rotate(img_warped, r_angle, axes=(0, 1), order=1, reshape=False)
         img = img * (1 + random.random() * 0.1) if random.getrandbits(1) else img * (1 - random.random() * 0.1)
-        img = np.clip(img*255, 0, 255).astype(np.uint8)
+        img = np.clip(img * 255, 0, 255).astype(np.uint8)
         return img
 
     def __call__(self, image, label):
@@ -151,7 +154,8 @@ class ImageAug(object):
 
 class TextLineDataset(torch.utils.data.Dataset):
 
-    def __init__(self, rootpath=None, text_line_file=None, transform=None, target_transform=None, use_rgb=True,is_train=True):
+    def __init__(self, rootpath=None, text_line_file=None, transform=None, target_transform=None, use_rgb=True,
+                 is_train=True):
         self.text_line_file = text_line_file
         with open(text_line_file) as fp:
             self.lines = fp.readlines()
@@ -185,10 +189,8 @@ class TextLineDataset(torch.utils.data.Dataset):
         label = int(label)
         if self.transform is not None:
             if self.is_train is True:
-                img,label = self.my_transform(img, label)
+                img, label = self.my_transform(img, label)
             img = self.transform(img)
-
-
 
         if self.target_transform is not None:
             label = self.target_transform(label)
